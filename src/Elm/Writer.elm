@@ -494,7 +494,7 @@ writeExpression (Node range inner) =
             string ("\"" ++ s ++ "\"")
 
         CharLiteral c ->
-            string ("'" ++ String.fromList [ c ] ++ "'")
+            writeChar c
 
         TupleExpression t ->
             join [ string "(", sepHelper sepByComma (List.map recurRangeHelper t), string ")" ]
@@ -568,6 +568,20 @@ escapeString =
     String.replace "\"" "\\\""
 
 
+writeChar : Char -> Writer
+writeChar c =
+    let
+        escape : String
+        escape =
+            if c == '\t' || c == '\'' || c == '\\' then
+                "\\"
+
+            else
+                ""
+    in
+    string ("'" ++ escape ++ String.fromChar c ++ "'")
+
+
 {-| Write a pattern
 -}
 writePattern : Node Pattern -> Writer
@@ -580,7 +594,7 @@ writePattern (Node _ p) =
             string "()"
 
         CharPattern c ->
-            string ("'" ++ String.fromList [ c ] ++ "'")
+            writeChar c
 
         StringPattern s ->
             string ("\"" ++ escapeString s ++ "\"")
